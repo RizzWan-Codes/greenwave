@@ -685,16 +685,62 @@ section, nav, footer, header {
   const db = getDatabase(app);
 
   // 🌐 Real-time listener for website content
-  const contentRef = ref(db, "websiteContent");
-  onValue(contentRef, (snapshot) => {
-    const data = snapshot.val();
-    if (!data) return;
-    document.querySelectorAll("[data-key]").forEach((el) => {
-      const key = el.dataset.key;
-      const value = key.split(".").reduce((o, i) => (o ? o[i] : undefined), data);
-      if (value !== undefined && value !== null) el.innerHTML = value;
-    });
+const contentRef = ref(db, "websiteContent");
+
+onValue(contentRef, (snapshot) => {
+  const data = snapshot.val();
+  if (!data) return;
+
+  // --- Global text replacements ---
+  document.querySelectorAll("[data-key]").forEach((el) => {
+    const key = el.dataset.key;
+    const value = key.split(".").reduce((o, i) => (o ? o[i] : undefined), data);
+    if (value !== undefined && value !== null) el.innerHTML = value;
   });
+
+  // --- Dynamic PROJECTS Section ---
+  const projectsContainer = document.querySelector("#projects .grid");
+  if (projectsContainer && data.projects?.cards) {
+    projectsContainer.innerHTML = ""; // clear old cards
+
+    Object.entries(data.projects.cards).forEach(([key, card], index) => {
+      const delay = 100 * (index + 1);
+      const projectCard = document.createElement("div");
+      projectCard.className =
+        "group relative overflow-hidden rounded-3xl shadow-2xl hover:shadow-green-500/30 transition-all duration-500 card-shine";
+      projectCard.setAttribute("data-aos", "fade-up");
+      projectCard.setAttribute("data-aos-delay", delay);
+
+      projectCard.innerHTML = `
+        <img src="${card.image || 'https://via.placeholder.com/800x600?text=No+Image'}"
+             class="w-full h-80 object-cover transition-transform duration-700 group-hover:scale-110 group-hover:rotate-2"
+             alt="${card.name || 'Project'}">
+
+        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 group-hover:opacity-95 transition-all duration-500"></div>
+
+        <div class="absolute top-4 right-4 stat-badge rounded-full px-4 py-2 text-white text-sm font-bold opacity-0 group-hover:opacity-100 transition-all duration-500">
+          ${card.badge || ""}
+        </div>
+
+        <div class="absolute bottom-0 left-0 w-full p-6 text-left transform translate-y-4 group-hover:translate-y-0 transition-all duration-500">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-yellow-400 text-2xl">${card.icon || "☀️"}</span>
+            <h3 class="text-white font-bold text-2xl drop-shadow-2xl">${card.name || "Unnamed Project"}</h3>
+          </div>
+          <p class="text-gray-200 text-base drop-shadow-lg mb-3 opacity-0 group-hover:opacity-100 transition-all duration-500 delay-100">
+            ${card.details || ""}
+          </p>
+        </div>
+      `;
+
+      projectsContainer.appendChild(projectCard);
+    });
+
+    // Refresh AOS animations dynamically
+    AOS.refresh();
+  }
+});
+
 
   // 📨 Form Logic
   const form = document.getElementById("contactForm");
