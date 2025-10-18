@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blog Post - GreenWave ☀️</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+</head>
+
+<body class="bg-gradient-to-b from-green-50 to-yellow-50 text-gray-800">
+
+  <!-- NAVBAR -->
+  <nav class="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-md shadow-md z-50">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+      <h1 class="text-2xl font-bold text-green-600">GreenWave Blog</h1>
+      <a href="blog.html" class="text-green-600 font-semibold hover:underline">← Back to Blogs</a>
+    </div>
+  </nav>
+
+  <!-- BLOG CONTENT -->
+  <main class="pt-28 pb-16 max-w-4xl mx-auto px-6" id="blogContainer">
+    <div id="loading" class="text-center text-gray-500 text-lg">Loading...</div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-gray-900 text-gray-300 py-8 text-center">
+    <p class="text-gray-400">© 2025 GreenWave. All Rights Reserved.</p>
+  </footer>
+
+  <!-- FIREBASE FETCH LOGIC -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyCgoCoF3C61EA09emEuWAhPMh212zhCQXA",
+      authDomain: "greenware-f23ff.firebaseapp.com",
+      databaseURL: "https://greenware-f23ff-default-rtdb.asia-southeast1.firebasedatabase.app/",
+      projectId: "greenware-f23ff",
+      storageBucket: "greenware-f23ff.firebasestorage.app",
+      messagingSenderId: "870851351793",
+      appId: "1:870851351793:web:7eb1f946c2b1f6ab9dc550"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const blogContainer = document.getElementById("blogContainer");
+    const loading = document.getElementById("loading");
+
+    // Get blog ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const blogId = urlParams.get("id");
+
+    if (!blogId) {
+      blogContainer.innerHTML = `<p class="text-center text-red-600">Invalid blog link.</p>`;
+      throw new Error("No blog ID found in URL.");
+    }
+
+    // Load blog metadata (title, author, etc.)
+    const postRef = ref(db, `websiteContent/blogs/posts/${blogId}`);
+    onValue(postRef, (snap) => {
+      const post = snap.val();
+      if (!post) {
+        blogContainer.innerHTML = `<p class="text-center text-red-600">Blog not found.</p>`;
+        return;
+      }
+
+      const formattedDate = post.date
+        ? new Date(post.date).toLocaleDateString("en-IN", { year: "numeric", month: "long", day: "numeric" })
+        : "";
+
+      blogContainer.innerHTML = `
+        <article class="bg-white rounded-2xl shadow-lg overflow-hidden p-6">
+          <img src="${post.image || 'https://images.unsplash.com/photo-1581093806559-0f8c2f92c784?auto=format&fit=crop&w=1000&q=80'}"
+               alt="${post.title}" class="rounded-xl w-full mb-6 h-80 object-cover" />
+          <h1 class="text-4xl font-bold text-green-700 mb-3">${post.title}</h1>
+          <p class="text-gray-500 mb-6">${formattedDate} • ${post.author || "Unknown"}</p>
+          <div id="blogDetailBlocks" class="prose max-w-none text-gray-700 leading-relaxed space-y-6"></div>
+        </article>
+      `;
+
+      // Load detailed blocks
+      const detailRef = ref(db, `websiteContent/blogs/details/${blogId}`);
+      onValue(detailRef, (snap2) => {
+        const blocks = snap2.val() || [];
+        const container = document.getElementById("blogDetailBlocks");
+        container.innerHTML = "";
+
+        if (blocks.length === 0) {
+          container.innerHTML = `<p class="text-gray-500">No detailed content available for this post.</p>`;
+          return;
+        }
+
+        blocks.forEach((block) => {
+          if (block.type === "text") {
+            const p = document.createElement("p");
+            p.textContent = block.content;
+            container.appendChild(p);
+          }
+          if (block.type === "image") {
+            const img = document.createElement("img");
+            img.src = block.url;
+            img.className = "rounded-xl shadow-md mx-auto";
+            container.appendChild(img);
+          }
+        });
+
+        loading.style.display = "none";
+        AOS.refresh();
+      });
+    });
+  </script>
+
+  <script>
+    AOS.init({ duration: 1000, once: true });
+  </script>
+</body>
+</html>

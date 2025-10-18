@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GreenWave Blog ☀️</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+</head>
+
+<body class="bg-gradient-to-b from-green-50 to-yellow-50 text-gray-800">
+
+  <!-- NAVBAR -->
+  <nav class="fixed top-0 left-0 w-full bg-white/90 backdrop-blur-md shadow-md z-50" data-aos="fade-down">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+      <h1 class="text-2xl font-bold text-green-600">GreenWave Blog</h1>
+      <a href="index.html" class="text-green-600 font-semibold hover:underline">← Back to Home</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="pt-28 pb-16 text-center" data-aos="fade-up">
+    <h2 id="blogTitle" class="text-5xl font-extrabold text-green-700 mb-3">The Solarverse Chronicles ☀️</h2>
+    <p id="blogSubtitle" class="text-lg text-gray-600 max-w-2xl mx-auto">
+      Stories, insights, and updates about clean energy, innovation, and how solar is shaping a better tomorrow.
+    </p>
+  </section>
+
+  <!-- BLOG GRID -->
+  <section id="blogGrid" class="max-w-7xl mx-auto px-6 pb-20 grid sm:grid-cols-2 lg:grid-cols-3 gap-10">
+    <!-- Blog posts will be dynamically inserted here -->
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="bg-gray-900 text-gray-300 py-8 text-center">
+    <p class="text-gray-400">© 2025 GreenWave. All Rights Reserved.</p>
+  </footer>
+
+  <!-- FIREBASE BLOG LOADER -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+    // 🧩 Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyCgoCoF3C61EA09emEuWAhPMh212zhCQXA",
+      authDomain: "greenware-f23ff.firebaseapp.com",
+      databaseURL: "https://greenware-f23ff-default-rtdb.asia-southeast1.firebasedatabase.app/",
+      projectId: "greenware-f23ff",
+      storageBucket: "greenware-f23ff.firebasestorage.app",
+      messagingSenderId: "870851351793",
+      appId: "1:870851351793:web:7eb1f946c2b1f6ab9dc550"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // 🎯 Blog Elements
+    const blogTitleEl = document.getElementById("blogTitle");
+    const blogSubtitleEl = document.getElementById("blogSubtitle");
+    const blogGrid = document.getElementById("blogGrid");
+
+    // 🔥 Listen to blogs in real-time
+    const blogsRef = ref(db, "websiteContent/blogs/posts");
+    onValue(blogsRef, (snapshot) => {
+      const data = snapshot.val();
+      if (!data) {
+        blogGrid.innerHTML = `
+          <div class="col-span-full text-center text-gray-500 text-lg">
+            😴 No blogs yet. Check back soon!
+          </div>`;
+        return;
+      }
+
+      const posts = Object.entries(data);
+      posts.sort((a, b) => new Date(b[1].date) - new Date(a[1].date));
+      blogGrid.innerHTML = "";
+
+      posts.forEach(([key, post], i) => {
+        const delay = i * 100;
+        const card = document.createElement("div");
+        card.className = "bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-green-300/60 transition-all transform hover:-translate-y-1";
+        card.setAttribute("data-aos", "fade-up");
+        card.setAttribute("data-aos-delay", delay);
+
+        const formattedDate = post.date
+          ? new Date(post.date).toLocaleDateString("en-IN", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })
+          : "Date unknown";
+
+        card.innerHTML = `
+          <img src="${post.image || "https://images.unsplash.com/photo-1581093806559-0f8c2f92c784?auto=format&fit=crop&w=800&q=80"}"
+               class="h-52 w-full object-cover"
+               alt="${post.title || "Solar Post"}">
+
+          <div class="p-6">
+            <h3 class="text-xl font-bold text-green-700 mb-2">${post.title || "Untitled Blog"}</h3>
+            <p class="text-gray-500 text-sm mb-3">${formattedDate} • ${post.author || "Unknown"}</p>
+            <p class="text-gray-700 mb-4 leading-relaxed">
+              ${post.content ? post.content.substring(0, 120) : "No content available"}...
+            </p>
+            <a href="blog-post.html?id=${key}" class="text-green-600 font-semibold hover:underline">Read More →</a>
+          </div>
+        `;
+
+        blogGrid.appendChild(card);
+      });
+
+      AOS.refresh();
+    });
+  </script>
+
+  <!-- INIT AOS -->
+  <script>
+    AOS.init({
+      duration: 1000,
+      once: true,
+      offset: 100,
+    });
+  </script>
+</body>
+</html>
