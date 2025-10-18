@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>GreenWave</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
@@ -133,6 +133,31 @@
       height: auto;
     }
   }
+
+  /* Fix container sizing and overflow for all sections */
+body, html {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+section, nav, footer, header {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Prevent partial responsive break triggers */
+.max-w-6xl, .max-w-7xl, .max-w-5xl {
+  width: 100%;
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  .grid, [class*="grid-cols-"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
   </style>
 </head>
 
@@ -157,7 +182,7 @@
 </nav>
 
 <!-- MOBILE NAV -->
-<div id="mobile-menu" class="fixed top-0 right-0 h-screen bg-white/90 backdrop-blur-md shadow-2xl flex flex-col items-center justify-center gap-12 text-xl text-gray-800 transform translate-x-full transition-all duration-500 ease-in-out z-50" style="width: 65vw;">
+<div id="mobile-menu" class="fixed top-0 right-0 h-screen bg-white shadow-2xl flex flex-col items-center justify-center gap-12 text-xl text-gray-800 transform translate-x-full transition-all duration-500 ease-in-out z-50" style="width: 65vw;">
   <button id="close-btn" class="absolute top-6 right-6 text-4xl text-gray-800 hover:text-green-600 transition">✖</button>
   <a href="#hero" class="hover:text-green-600 transition" data-aos="slide-left" data-aos-delay="100">Home</a>
   <a href="#about" class="hover:text-green-600 transition" data-aos="slide-left" data-aos-delay="200">About</a>
@@ -613,6 +638,15 @@
   </div>
 </footer>
 
+<script>
+   // Force reflow after DOM load to ensure media queries apply correctly
+  window.addEventListener('load', () => {
+    document.body.style.display = 'none';
+    document.body.offsetHeight; // trigger reflow
+    document.body.style.display = '';
+  });
+</script>
+
 <!-- ANIMATIONS -->
 <style>
 @keyframes gradient-move {
@@ -703,6 +737,7 @@
     offset: 100
   });
 </script>
+
 
 <script>
   /* ========== Utilities ========== */
@@ -979,6 +1014,40 @@ computeAll();
   });
 
 </script>
+
+<script>
+  // ===== MOBILE MENU TOGGLE =====
+  const menuBtn = document.getElementById("menu-btn");
+  const closeBtn = document.getElementById("close-btn");
+  const mobileMenu = document.getElementById("mobile-menu");
+  const overlay = document.getElementById("overlay");
+
+  function openMenu() {
+    mobileMenu.classList.remove("translate-x-full");
+    mobileMenu.classList.add("translate-x-0");
+    overlay.classList.remove("opacity-0", "pointer-events-none");
+    overlay.classList.add("opacity-100");
+    document.body.style.overflow = "hidden"; // prevent scroll
+  }
+
+  function closeMenu() {
+    mobileMenu.classList.remove("translate-x-0");
+    mobileMenu.classList.add("translate-x-full");
+    overlay.classList.remove("opacity-100");
+    overlay.classList.add("opacity-0", "pointer-events-none");
+    document.body.style.overflow = ""; // restore scroll
+  }
+
+  menuBtn.addEventListener("click", openMenu);
+  closeBtn.addEventListener("click", closeMenu);
+  overlay.addEventListener("click", closeMenu);
+
+  // Optional: close menu when a link is clicked
+  document.querySelectorAll("#mobile-menu a").forEach(link => {
+    link.addEventListener("click", closeMenu);
+  });
+</script>
+
 
 </body>
 </html>
