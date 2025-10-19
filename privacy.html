@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Privacy Policy | GreenWave</title>
+  <meta name="description" content="Learn how GreenWave collects, uses, and protects your data when you visit our website or use our services.">
+  <link rel="icon" href="/favicon.ico">
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <style>
+    :root{
+      --green:#0f9d58;
+      --dark-green:#0a6b3a;
+      --muted:#6b7280;
+      --bg:#ffffff;
+      --maxw:980px;
+    }
+    html,body{height:100%;}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
+      color:#111827;
+      background:var(--bg);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.6;
+    }
+    header{
+      background:linear-gradient(90deg,var(--green),#b8e986);
+      color:white;
+      padding:36px 18px;
+    }
+    .container{max-width:var(--maxw);margin:0 auto;padding:32px 18px;}
+    h1{font-size:28px;margin:0 0 8px;}
+    p.lead{color:rgba(255,255,255,0.95);margin:0;font-weight:500}
+    main{padding:30px 18px;}
+    h2{color:var(--dark-green);font-size:20px;margin:18px 0 8px;}
+    section{margin-bottom:20px;background:#fff;border-radius:10px;padding:18px;box-shadow:0 6px 18px rgba(6,23,10,0.04)}
+    ul{padding-left:20px;margin:8px 0}
+    footer{background:#0b5b33;color:#e6f7e8;padding:22px 18px;text-align:center;margin-top:28px}
+    a.link{color:var(--green);text-decoration:underline}
+    /* responsive */
+    @media (max-width:640px){
+      header{padding:22px 14px}
+      h1{font-size:22px}
+      .container{padding:18px 14px}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container" data-aos="fade-down">
+      <h1 id="pageTitle">Privacy Policy</h1>
+      <p class="lead" id="pageIntro">Your privacy, our priority — how we collect and use your data.</p>
+    </div>
+  </header>
+
+  <main class="container" id="mainContent">
+    <!-- These blocks will be replaced by Firebase content if available -->
+    <section data-aos="fade-up" data-key="privacy.intro">
+      <h2>Introduction</h2>
+      <p>At <strong>GreenWave</strong>, we value your privacy. This Privacy Policy explains how we collect, use, and safeguard your personal information when you visit our website or use our services.</p>
+    </section>
+
+    <section data-aos="fade-up" data-key="privacy.collect">
+      <h2>Information We Collect</h2>
+      <ul>
+        <li>Information you provide via our contact form (name, email, phone, city).</li>
+        <li>Automatically collected data (browser, device, IP, analytics).</li>
+        <li>Cookies used for site performance and analytics.</li>
+      </ul>
+    </section>
+
+    <section data-aos="fade-up" data-key="privacy.use">
+      <h2>How We Use Your Information</h2>
+      <p>We use your data to respond to inquiries, improve the site, and send updates if you opt in.</p>
+    </section>
+
+    <section data-aos="fade-up" data-key="privacy.security">
+      <h2>Data Security</h2>
+      <p>We implement industry-standard measures to protect your information. No internet transmission is 100% secure.</p>
+    </section>
+
+    <section data-aos="fade-up" data-key="privacy.contact">
+      <h2>Your Rights</h2>
+      <p>You can request access, correction or deletion of your personal data. Contact us at <a class="link" href="mailto:support@greenwave.in">support@greenwave.in</a>.</p>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <small>© <span id="footerYear">2025</span> <strong>GreenWave</strong>. All Rights Reserved.</small>
+    </div>
+  </footer>
+
+  <!-- Firebase + content loader -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCgoCoF3C61EA09emEuWAhPMh212zhCQXA",
+      authDomain: "greenware-f23ff.firebaseapp.com",
+      databaseURL: "https://greenware-f23ff-default-rtdb.asia-southeast1.firebasedatabase.app/",
+      projectId: "greenware-f23ff",
+      storageBucket: "greenware-f23ff.firebasestorage.app",
+      messagingSenderId: "870851351793",
+      appId: "1:870851351793:web:7eb1f946c2b1f6ab9dc550"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // Helper to set innerHTML only if value exists
+    function setIf(el, html){ if(!el) return; if(html===undefined || html===null) return; el.innerHTML = html; }
+
+    // Map of data-key => element selector(s)
+    const mapping = {
+      "privacy.title": document.getElementById("pageTitle"),
+      "privacy.intro": null,    // matched by data-key attribute sections below
+      "privacy.collect": null,
+      "privacy.use": null,
+      "privacy.security": null,
+      "privacy.contact": null,
+      "privacy.footerYear": document.getElementById("footerYear")
+    };
+
+    // Generic hydrator: update elements that have data-key attributes OR specific IDs above
+    onValue(ref(db, "privacy"), (snap) => {
+      const data = snap.val() || {};
+      // update mapped IDs
+      if (data.title) setIf(mapping["privacy.title"], data.title);
+      if (data.footerYear) setIf(mapping["privacy.footerYear"], data.footerYear);
+      // update sections with data-key attributes
+      document.querySelectorAll("[data-key]").forEach(el=>{
+        const key = el.dataset.key;
+        // only update if the key path starts with 'privacy.'
+        if(key && key.startsWith("privacy.")){
+          // transform key to path in data object: e.g. "privacy.intro" -> data.intro
+          const subKey = key.split(".")[1];
+          if(subKey && data[subKey] !== undefined){
+            el.innerHTML = data[subKey];
+          }
+        }
+      });
+    }, { onlyOnce:false });
+  </script>
+
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script> AOS.init({ duration:800, once:true, easing:"ease-in-out" }); </script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Terms of Service | GreenWave</title>
+  <meta name="description" content="Read the terms and conditions for using GreenWave’s solar energy products and website.">
+  <link rel="icon" href="/favicon.ico">
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <style>
+    :root{
+      --green:#0f9d58;
+      --dark:#0a6b3a;
+      --bg:#ffffff;
+      --maxw:980px;
+    }
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:#111827;line-height:1.6}
+    header{background:linear-gradient(90deg,var(--green),#cfeccf);padding:36px 18px;color:white}
+    .container{max-width:var(--maxw);margin:0 auto;padding:32px 18px}
+    h1{margin:0;font-size:28px}
+    p.lead{margin:6px 0 0;color:rgba(255,255,255,0.95)}
+    main{padding:30px 18px}
+    section{background:#fff;border-radius:10px;padding:18px;margin-bottom:18px;box-shadow:0 6px 18px rgba(6,23,10,0.04)}
+    h2{color:var(--dark);font-size:20px;margin:8px 0}
+    ul{padding-left:20px}
+    footer{background:#0b5b33;color:#e6f7e8;padding:22px 18px;text-align:center;margin-top:18px}
+    @media (max-width:640px){header{padding:22px 14px};h1{font-size:22px}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container" data-aos="fade-down">
+      <h1 id="termsTitle">Terms of Service</h1>
+      <p class="lead">Please read these terms before using our website or services.</p>
+    </div>
+  </header>
+
+  <main class="container" id="mainContent">
+    <section data-aos="fade-up" data-key="terms.acceptance">
+      <h2>1. Acceptance of Terms</h2>
+      <p>By accessing GreenWave’s site and services you agree to these Terms. If you disagree, please stop using the services.</p>
+    </section>
+
+    <section data-aos="fade-up" data-key="terms.use">
+      <h2>2. Use of Services</h2>
+      <ul>
+        <li>Use our website for lawful, legitimate purposes only.</li>
+        <li>Do not attempt to hack, disrupt, or misuse the platform.</li>
+      </ul>
+    </section>
+
+    <section data-aos="fade-up" data-key="terms.intellectual">
+      <h2>3. Intellectual Property</h2>
+      <p>All site content is owned or licensed by GreenWave. Reproduction without permission is prohibited.</p>
+    </section>
+
+    <section data-aos="fade-up" data-key="terms.liability">
+      <h2>4. Limitation of Liability</h2>
+      <p>GreenWave is not liable for indirect or consequential damages arising from use of the website or services.</p>
+    </section>
+
+    <section data-aos="fade-up" data-key="terms.contact">
+      <h2>Contact</h2>
+      <p>Questions? Email <a class="link" href="mailto:support@greenwave.in">support@greenwave.in</a>.</p>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <small>© <span id="year">2025</span> GreenWave — All Rights Reserved.</small>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCgoCoF3C61EA09emEuWAhPMh212zhCQXA",
+      authDomain: "greenware-f23ff.firebaseapp.com",
+      databaseURL: "https://greenware-f23ff-default-rtdb.asia-southeast1.firebasedatabase.app/",
+      projectId: "greenware-f23ff",
+      storageBucket: "greenware-f23ff.firebasestorage.app",
+      messagingSenderId: "870851351793",
+      appId: "1:870851351793:web:7eb1f946c2b1f6ab9dc550"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // update sections keyed by data-key
+    onValue(ref(db, "terms"), (snap) => {
+      const data = snap.val() || {};
+      document.querySelectorAll("[data-key]").forEach(el=>{
+        const key = el.dataset.key;
+        if(key && key.startsWith("terms.")){
+          const sub = key.split(".")[1];
+          if(sub && data[sub] !== undefined) el.innerHTML = data[sub];
+        }
+      });
+      if(data.year) document.getElementById("year").textContent = data.year;
+      if(data.title) document.getElementById("termsTitle").textContent = data.title;
+    }, { onlyOnce:false });
+  </script>
+
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script> AOS.init({ duration:800, once:true, easing:"ease-in-out" }); </script>
+</body>
+</html>
