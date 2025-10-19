@@ -852,6 +852,73 @@ onValue(contentRef, (snapshot) => {
         alert("❌ Error sending message: " + err.message);
       });
   });
+
+   // 🌿 FOOTER LIVE FETCH
+onValue(ref(db, "websiteContent/footer"), (snap) => {
+  const d = snap.val();
+  if (!d) return;
+
+  // 🌞 Brand Info
+  const brandEl = document.querySelector("footer h3");
+  if (brandEl) brandEl.innerHTML = "🌞 " + (d.title || "GreenWave");
+
+  const subtitleEl = document.querySelector('[data-key="footer.subtitle"]');
+  if (subtitleEl)
+    subtitleEl.textContent =
+      d.subtitle || "Making clean, affordable, and renewable energy accessible to everyone.";
+
+  const contactEl = document.querySelector("footer .space-y-2.text-gray-300");
+  if (contactEl) {
+    contactEl.innerHTML = `
+      <p><i class="fa-solid fa-envelope mr-2 text-yellow-400"></i> ${d.email || "support@greenwave.in"}</p>
+      <p><i class="fa-solid fa-phone mr-2 text-yellow-400"></i> ${d.phone || "+91 98765 43210"}</p>
+      <p><i class="fa-solid fa-location-dot mr-2 text-yellow-400"></i> ${d.address || "Pune, Maharashtra, India"}</p>
+    `;
+  }
+
+  // 🔗 Quick Links
+  const quickLinks = d.quickLinks || ["About Us", "Services", "Projects", "Blogs", "Contact"];
+  const quickLinksHTML = quickLinks
+    .map(
+      (link) =>
+        `<li><a href="#${link.toLowerCase().replace(/\s+/g, "")}" class="hover:text-yellow-300 transition">${link}</a></li>`
+    )
+    .join("");
+  const quickListEl = document.querySelectorAll("footer ul.space-y-2.text-gray-300.text-sm")[0];
+  if (quickListEl) quickListEl.innerHTML = quickLinksHTML;
+
+  // ⚡ Services
+  const services = d.services || ["Solar Installation", "Energy Auditing", "Maintenance", "Solar Finance & EMI"];
+  const servicesHTML = services.map((s) => `<li>${s}</li>`).join("");
+  const serviceListEl = document.querySelectorAll("footer ul.space-y-2.text-gray-300.text-sm")[1];
+  if (serviceListEl) serviceListEl.innerHTML = servicesHTML;
+
+  // 📬 Newsletter
+  const newsletterEl = document.querySelector("footer p.text-gray-300.text-sm.mb-4");
+  if (newsletterEl)
+    newsletterEl.textContent =
+      d.newsletter || "Subscribe for updates on solar tech, savings tips, and GreenWave insights.";
+  const buttonEl = document.querySelector("footer button[type='submit']");
+  if (buttonEl) buttonEl.textContent = d.buttonText || "Subscribe";
+
+  // 📄 Copyright
+  const copyrightEl = document.querySelector('[data-key="footer.copyright"]');
+  if (copyrightEl)
+    copyrightEl.innerHTML =
+      d.copyright ||
+      `© ${new Date().getFullYear()} <span class="text-yellow-400 font-semibold">GreenWave</span>. All rights reserved.`;
+
+  // ⚖️ Legal Links
+  const legalLinks = d.legalLinks || ["Privacy Policy", "Terms of Service"];
+  const legalHTML = legalLinks
+    .map((link) => {
+      const file = link.toLowerCase().includes("privacy") ? "privacy.html" : "terms.html";
+      return `<a href="${file}" class="hover:text-yellow-300 transition">${link}</a>`;
+    })
+    .join("");
+  const legalEl = document.querySelector("footer .flex.gap-4");
+  if (legalEl) legalEl.innerHTML = legalHTML;
+});
 </script>
 
 
@@ -1173,7 +1240,12 @@ computeAll();
   document.querySelectorAll("#mobile-menu a").forEach(link => {
     link.addEventListener("click", closeMenu);
   });
+
+ 
+
 </script>
+
+
 
 
 </body>
