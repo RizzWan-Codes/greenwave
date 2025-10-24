@@ -748,7 +748,9 @@ section, nav, footer, header {
 <script type="module">
   // Import Firebase SDK
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-  import { getDatabase, ref, onValue, push, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+ import { getDatabase, ref, onValue, push, set, runTransaction } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+  
 
   // 🧩 Your Firebase Config
   const firebaseConfig = {
@@ -918,6 +920,27 @@ onValue(ref(db, "websiteContent/footer"), (snap) => {
     .join("");
   const legalEl = document.querySelector("footer .flex.gap-4");
   if (legalEl) legalEl.innerHTML = legalHTML;
+});
+
+// ---- VISITOR COUNTER ----
+const visitorsRef = ref(db, 'analytics/visitors');
+if (!sessionStorage.getItem("visited")) {
+  runTransaction(visitorsRef, (count) => (count || 0) + 1);
+  sessionStorage.setItem("visited", "true");
+}
+
+// ---- CLICK COUNTER ----
+const clicksRef = ref(db, 'analytics/clicks');
+let clickCooldown = false;
+
+document.addEventListener("click", () => {
+  if (clickCooldown) return; // avoid overloading on spam clicks
+  clickCooldown = true;
+
+  runTransaction(clicksRef, (count) => (count || 0) + 1);
+
+  // Cooldown of 100ms between click logs (so double-clicks don't double-count instantly)
+  setTimeout(() => (clickCooldown = false), 100);
 });
 </script>
 
